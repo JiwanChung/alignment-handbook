@@ -187,8 +187,13 @@ class ModelArguments:
     use_bnb_nested_quant: bool = field(default=False, metadata={"help": "use nested quantization"})
 
     additional_special_tokens: Optional[str] = field(
-        default=None
+        default=None,
         metadata={"help": ("additional_special_tokens w/ braceexpand. split by comma. e.g. '<SPECIAL_{0..128}>,<OTHERS_{1..9}>'")}
+    )
+
+    model_max_length: Optional[int] = field(
+        default=None,
+        metadata={"help": ("override model_max_length")}
     )
 
     def __post_init__(self):

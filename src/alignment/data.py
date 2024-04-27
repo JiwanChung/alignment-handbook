@@ -227,7 +227,8 @@ def mix_datasets(
             elif "test" in split:
                 raw_val_datasets.append(dataset)
             else:
-                raise ValueError(f"Split type {split} not recognized as one of test or train.")
+                raw_train_datasets.append(dataset)
+                # raise ValueError(f"Split type {split} not recognized as one of test or train.")
 
     if any(frac < 0 for frac in fracs):
         raise ValueError("Dataset fractions cannot be negative.")
