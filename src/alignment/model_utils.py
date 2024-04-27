@@ -15,6 +15,7 @@
 import os
 from pathlib import Path
 from typing import Dict
+from itertools import chain
 
 import torch
 from transformers import AutoTokenizer, BitsAndBytesConfig, PreTrainedTokenizer
@@ -25,6 +26,7 @@ from huggingface_hub import list_repo_files
 from huggingface_hub.utils._errors import RepositoryNotFoundError
 from huggingface_hub.utils._validators import HFValidationError
 from peft import LoraConfig, PeftConfig
+from braceexpand import braceexpand
 
 from .configs import DataArguments, DPOConfig, ModelArguments, SFTConfig
 from .data import DEFAULT_CHAT_TEMPLATE
@@ -62,16 +64,25 @@ def get_quantization_config(model_args: ModelArguments) -> BitsAndBytesConfig | 
     return quantization_config
 
 
+def build_tokens_from_args(text):
+    texts = text.split(',')
+    return list(chain(*[
+        list(braceexpand(text)) for text in texts
+    ]))
+
+
 def get_tokenizer(
     model_args: ModelArguments, data_args: DataArguments, auto_set_chat_template: bool = True
 ) -> PreTrainedTokenizer:
     """Get the tokenizer for the model."""
+    additional_special_tokens = build_tokens_from_args(model_args.additional_special_tokens)
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.model_name_or_path
         if model_args.tokenizer_name_or_path is None
         else model_args.tokenizer_name_or_path,
         revision=model_args.model_revision,
         trust_remote_code=model_args.trust_remote_code,
+        additional_special_tokens=additional_special_tokens
     )
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token_id = tokenizer.eos_token_id

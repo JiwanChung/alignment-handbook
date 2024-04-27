@@ -186,6 +186,11 @@ class ModelArguments:
     )
     use_bnb_nested_quant: bool = field(default=False, metadata={"help": "use nested quantization"})
 
+    additional_special_tokens: Optional[str] = field(
+        default=None
+        metadata={"help": ("additional_special_tokens w/ braceexpand. split by comma. e.g. '<SPECIAL_{0..128}>,<OTHERS_{1..9}>'")}
+    )
+
     def __post_init__(self):
         if self.load_in_8bit and self.load_in_4bit:
             raise ValueError("You can't use 8 bit and 4 bit precision at the same time")
